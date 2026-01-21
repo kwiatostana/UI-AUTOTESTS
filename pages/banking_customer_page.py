@@ -2,12 +2,15 @@ import random
 import re
 
 import allure
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 
 from pages.banking_home_page import BankingHomePage
 from pages.base_page import BasePage
+from src.constants import ZERO
 
 
 class BankingCustomerPage(BasePage):
@@ -118,6 +121,7 @@ class BankingCustomerPage(BasePage):
     @allure.step("Перейти в раздел Transactions")
     def click_transactions(self) -> "BankingCustomerPage":
         """Перейти в раздел Transactions"""
+        self.wait.until(EC.element_to_be_clickable(self.TRANSACTIONS_BUTTON))
         self.click(self.TRANSACTIONS_BUTTON)
         return self
 
@@ -132,7 +136,7 @@ class BankingCustomerPage(BasePage):
         """Подсчитать баланс из таблицы транзакций"""
         transactions = self.find_elements(self.TRANSACTIONS_ROWS)
 
-        total_balance = 0
+        total_balance = ZERO
         for row in transactions:
             amount, trans_type = self._extract_data_from_transaction(row)
             if trans_type == "Credit":
@@ -149,7 +153,7 @@ class BankingCustomerPage(BasePage):
         cells = transaction_row.find_elements(By.TAG_NAME, "td")
 
         if not cells:
-            return 0, ""
+            return ZERO, ""
 
         amount_text = cells[1].text
         trans_type = cells[2].text
@@ -164,16 +168,19 @@ class BankingCustomerPage(BasePage):
     @allure.step("Получить сумму последней транзакции")
     def get_last_transaction_amount(self) -> str:
         """Получить сумму последней транзакции"""
-        self.wait.until(lambda d: len(d.find_elements(*self.TRANSACTIONS_ROWS)) > 0)
+        self.wait.until(EC.presence_of_element_located(self.TRANSACTIONS_ROWS))
         transactions = self.find_elements(self.TRANSACTIONS_ROWS)
         return transactions[-1].find_element(*self.TRANSACTION_AMOUNT_CELL).text
 
     @allure.step("Проверить наличие транзакции с суммой {amount}")
     def is_transaction_present(self, amount: int) -> bool:
         """Проверить наличие транзакции с указанной суммой"""
-        self.wait.until(lambda d: len(d.find_elements(*self.TRANSACTIONS_ROWS)) > 0)
         locator = (By.XPATH, self.TRANSACTION_BY_AMOUNT_XPATH.format(amount=amount))
-        return self.is_present(locator)
+        try:
+            self.wait.until(EC.presence_of_element_located(locator))
+            return True
+        except TimeoutException:
+            return False
 
     @allure.step("Сбросить список транзакций")
     def click_reset(self) -> "BankingCustomerPage":

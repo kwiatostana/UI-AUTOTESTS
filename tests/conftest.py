@@ -1,19 +1,17 @@
-import uuid
 from collections.abc import Generator
 
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.remote.webdriver import WebDriver
-from webdriver_manager.chrome import ChromeDriverManager
 
 from pages.banking_home_page import BankingHomePage
 from pages.banking_manager_page import BankingManagerPage
 from pages.home_page import HomePage
 from pages.login_page import LoginPage
 from src.constants import BANKING_URL, HOME_URL, LOGIN_URL, POPUP_TIMEOUT
-from utils.data_generator import DataGenerator
+from utils.data_generator import (generate_customer_data,
+                                  generate_registration_data)
 
 
 @pytest.fixture
@@ -22,7 +20,7 @@ def driver() -> Generator[WebDriver]:
     chrome_options = Options()
     chrome_options.add_argument("--start-maximized")
 
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    driver = webdriver.Chrome(options=chrome_options)
 
     yield driver
 
@@ -46,40 +44,13 @@ def opened_login_page(driver: WebDriver) -> LoginPage:
     return page
 
 
-@pytest.fixture
-def banking_test_data(driver: WebDriver) -> Generator[dict[str, dict[str, str]]]:
-    """
-    Генерирует все данные для E2E теста банковского приложения.
-    """
-    unique_id = str(uuid.uuid4())[:8].replace("-", "")
-    customer_data = DataGenerator.generate_customer_data(unique_id)
-    registration_data = DataGenerator.generate_registration_data(unique_id)
-
-    yield {"customer_data": customer_data, "registration_data": registration_data}
-
-    try:
-        home_page = BankingHomePage(driver)
-        home_page.open(BANKING_URL)
-        home_page.navigate_to_bank_manager_login()
-
-        manager_page = BankingManagerPage(driver)
-        manager_page.click_customers()
-        manager_page.search_customer(customer_data["first_name"])
-        customer_rows = manager_page.get_customer_row_texts()
-        if any(customer_data["first_name"] in row for row in customer_rows):
-            manager_page.delete_customer()
-            manager_page.clear_search()
-    except Exception as e:
-        print(f"Ошибка при удалении клиента {customer_data['first_name']}: {e}")
-
-
 @pytest.fixture(scope="class")
 def driver_class() -> Generator[WebDriver]:
     """Фикстура драйвера с scope='class' для общего состояния во всех тестах класса"""
     chrome_options = Options()
     chrome_options.add_argument("--start-maximized")
 
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    driver = webdriver.Chrome(options=chrome_options)
 
     yield driver
 
@@ -88,12 +59,9 @@ def driver_class() -> Generator[WebDriver]:
 
 @pytest.fixture(scope="class")
 def banking_test_data_class(driver_class: WebDriver) -> Generator[dict[str, dict[str, str]]]:
-    """
-    Фикстура данных с scope='class' для использования одних и тех же данных во всех тестах класса.
-    """
-    unique_id = str(uuid.uuid4())[:8].replace("-", "")
-    customer_data = DataGenerator.generate_customer_data(unique_id)
-    registration_data = DataGenerator.generate_registration_data(unique_id)
+    """Фикстура данных с scope='class'"""
+    customer_data = generate_customer_data()
+    registration_data = generate_registration_data()
 
     yield {"customer_data": customer_data, "registration_data": registration_data}
 
