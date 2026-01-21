@@ -1,3 +1,5 @@
+import allure
+
 """Page Object для главной страницы"""
 
 from selenium.common.exceptions import TimeoutException
@@ -36,6 +38,7 @@ class HomePage(BasePage):
     ALL_COURSES_MENU = (By.ID, "menu-item-27580")
     LIFETIME_MEMBERSHIP_MENU = (By.ID, "menu-item-27581")
 
+    @allure.step("Прокрутить к кнопке регистрации")
     def scroll_to_register_button(self) -> "HomePage":
         """Прокрутить к кнопке регистрации"""
         try:
@@ -46,17 +49,20 @@ class HomePage(BasePage):
             pass
         return self
 
+    @allure.step("Переход на страницу Lifetime membership")
     def navigate_to_lifetime_membership(self) -> "HomePage":
         """Переход на страницу Lifetime membership"""
         self.click(self.ALL_COURSES_MENU).click(self.LIFETIME_MEMBERSHIP_MENU)
         return self
 
+    @allure.step("Кликнуть по кнопке 'Вперед' слайдера")
     def click_slider_next(self) -> "HomePage":
         """Кликнуть по кнопке 'Вперед' слайдера"""
         self.scroll_to_element(self.SLIDER_NEXT_BUTTON)
         self.click(self.SLIDER_NEXT_BUTTON)
         return self
 
+    @allure.step("Кликнуть по кнопке 'Назад' слайдера")
     def click_slider_prev(self) -> "HomePage":
         """Кликнуть по кнопке 'Назад' слайдера"""
         self.scroll_to_element(self.SLIDER_PREV_BUTTON)

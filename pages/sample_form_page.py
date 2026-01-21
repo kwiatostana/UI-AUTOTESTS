@@ -1,3 +1,4 @@
+import allure
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 
@@ -21,6 +22,7 @@ class SampleFormPage(BasePage):
     REGISTER_BUTTON = (By.CSS_SELECTOR, "button[type='submit']")
     SUCCESS_MESSAGE = (By.ID, "successMessage")
 
+    @allure.step("Заполнить основные поля формы")
     def fill_registration_form(self, first_name: str, last_name: str, email: str, password: str) -> "SampleFormPage":
         """Заполнить основные поля формы"""
         return (
@@ -30,6 +32,7 @@ class SampleFormPage(BasePage):
             .send_keys(self.PASSWORD_FIELD, password)
         )
 
+    @allure.step("Выбрать хобби")
     def select_hobby(self) -> "SampleFormPage":
         """Выбрать хобби"""
         checkbox = self.find_element(self.HOBBY_SPORTS)
@@ -39,6 +42,7 @@ class SampleFormPage(BasePage):
 
         return self
 
+    @allure.step("Выбрать пол: {value}")
     def select_gender(self, value: str) -> "SampleFormPage":
         """Выбрать пол в выпадающем списке"""
         dropdown = self.find_element(self.GENDER_DROPBOX)
@@ -46,12 +50,14 @@ class SampleFormPage(BasePage):
         select.select_by_value(value)
         return self
 
+    @allure.step("Получить список всех доступных хобби")
     def get_hobby_words(self) -> list[str]:
         """Получить список текстов всех доступных хобби"""
         hobbies_elements = self.find_elements(self.HOBBIES_LABELS)
         hobbies_texts = [elem.text.strip() for elem in hobbies_elements if elem.text.strip()]
         return hobbies_texts
 
+    @allure.step("Нажать кнопку Register")
     def submit_registration(self) -> "SampleFormPage":
         """Нажать кнопку Register"""
         self.scroll_to_element(self.REGISTER_BUTTON)

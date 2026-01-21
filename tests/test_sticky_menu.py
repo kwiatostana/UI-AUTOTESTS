@@ -3,7 +3,10 @@ import allure
 from pages.home_page import HomePage
 
 
-@allure.feature("Тесты навигационного меню")
+@allure.epic("Пользовательский интерфейс")
+@allure.feature("Навигационное меню")
+@allure.story("Закрепленное меню при скроллинге")
+@allure.severity(allure.severity_level.MINOR)
 class TestStickyMenu:
     """Тест-кейс 2: Меню навигации при скроллинге"""
 

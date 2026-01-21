@@ -6,7 +6,10 @@ from pages.home_page import HomePage
 from src.constants import DEFAULT_TIMEOUT, ZERO
 
 
-@allure.feature("Тесты главной страницы")
+@allure.epic("Пользовательский интерфейс")
+@allure.feature("Главная страница")
+@allure.story("Отображение элементов и навигация на главной странице")
+@allure.severity(allure.severity_level.NORMAL)
 class TestHomePageUI:
     """Тест-кейс 1: Главная страница"""
 
@@ -46,8 +49,7 @@ class TestHomePageUI:
 
     @allure.title("Проверка работы навигации")
     def test_courses_slider_navigation_works(self, opened_home_page: HomePage) -> None:
-        with allure.step("Прокрутить к слайдеру курсов"):
-            opened_home_page.scroll_to_element(opened_home_page.COURSES_SLIDER)
+        opened_home_page.scroll_to_element(opened_home_page.COURSES_SLIDER)
 
         with allure.step("Получить href начального слайда"):
             slides = opened_home_page.find_elements(opened_home_page.COURSES_SLIDER)
@@ -60,8 +62,9 @@ class TestHomePageUI:
                         break
             assert initial_href, "Не удалось получить ссылку (href) активного слайда"
 
-        with allure.step("Проверить работу кнопки 'Вперед' слайдера"):
-            opened_home_page.click_slider_next()
+        opened_home_page.click_slider_next()
+
+        with allure.step("Проверить изменение href после нажатия 'Вперед'"):
             wait = WebDriverWait(opened_home_page.driver, DEFAULT_TIMEOUT)
             try:
                 wait.until(
@@ -85,8 +88,9 @@ class TestHomePageUI:
                 f"Href не изменился после нажатия 'Вперед'. Ожидалось отличие от {initial_href}, получено {after_next_href}"
             )
 
-        with allure.step("Проверить работу кнопки 'Назад' слайдера"):
-            opened_home_page.click_slider_prev()
+        opened_home_page.click_slider_prev()
+
+        with allure.step("Проверить возврат к исходному href после нажатия 'Назад'"):
             wait = WebDriverWait(opened_home_page.driver, DEFAULT_TIMEOUT)
             try:
                 wait.until(
@@ -112,19 +116,14 @@ class TestHomePageUI:
 
     @allure.title("Проверка наличия необходимой информации")
     def test_footer_contains_required_information(self, opened_home_page: HomePage) -> None:
-        with allure.step("Прокрутить к футеру"):
-            opened_home_page.scroll_to_element(opened_home_page.FOOTER)
+        opened_home_page.scroll_to_element(opened_home_page.FOOTER)
 
-        with allure.step("Проверить отображение футера"):
+        with allure.step("Проверить отображение футера и контактных данных в нем"):
             assert opened_home_page.is_displayed(opened_home_page.FOOTER), "Футер не отображается"
-
-        with allure.step("Проверить отображение адреса в футере"):
             assert opened_home_page.is_displayed(opened_home_page.FOOTER_ADDRESS), "Адрес не отображается в футере"
 
-        with allure.step("Проверить наличие телефонов в футере"):
             phones = opened_home_page.find_elements(opened_home_page.FOOTER_PHONES)
             assert len(phones) > ZERO, f"В футере должно быть больше {ZERO} телефонов, но найдено {len(phones)}"
 
-        with allure.step("Проверить наличие email адресов в футере"):
             emails = opened_home_page.find_elements(opened_home_page.FOOTER_EMAILS)
             assert len(emails) > ZERO, f"В футере должно быть больше {ZERO} email адресов, но найдено {len(emails)}"
