@@ -19,6 +19,14 @@ class HomePage(BasePage):
     COURSES_LIST = (By.CSS_SELECTOR, "div[data-id='259f3103']")
     FOOTER = (By.CSS_SELECTOR, "div[data-id='573bc308']")
 
+    MAIN_ELEMENTS = {
+        "HEADER_CONTACT": HEADER_CONTACT,
+        "NAVIGATION_MENU": NAVIGATION_MENU,
+        "REGISTER_BUTTON": REGISTER_BUTTON,
+        "COURSES_LIST": COURSES_LIST,
+        "FOOTER": FOOTER,
+    }
+
     PHONE_NUMBERS = (By.XPATH, "//a[contains(@href, 'tel:') or contains(@href, 'wa.me')]")
     SKYPE_LINK = (By.XPATH, "//a[starts-with(@href, 'skype:')]")
     EMAIL = (By.XPATH, "//a[starts-with(@href, 'mailto:')]")
@@ -68,3 +76,56 @@ class HomePage(BasePage):
         self.scroll_to_element(self.SLIDER_PREV_BUTTON)
         self.click(self.SLIDER_PREV_BUTTON)
         return self
+
+    @allure.step("Получить href активного слайда")
+    def get_active_slide_href(self) -> str:
+        """Получить href активного (видимого) слайда"""
+        slides = self.find_elements(self.COURSES_SLIDER)
+        for slide in slides:
+            if slide.is_displayed():
+                href = slide.get_attribute("href")
+                if href:
+                    return href
+        return ""
+
+    @allure.step("Подождать изменения href активного слайда")
+    def wait_for_slider_change(self, initial_href: str) -> str:
+        """
+        Ожидает, пока href активного слайда не изменится по сравнению с initial_href.
+        Возвращает новый href.
+        """
+        try:
+            self.wait.until(
+                lambda _: any(
+                    slide.is_displayed() and slide.get_attribute("href") != initial_href
+                    for slide in self.find_elements(self.COURSES_SLIDER)
+                )
+            )
+        except TimeoutException:
+            pass
+        return self.get_active_slide_href()
+
+    @allure.step("Подождать совпадения href активного слайда")
+    def wait_for_slider_match(self, expected_href: str) -> str:
+        """
+        Ожидает, пока href активного слайда не станет равен expected_href.
+        Возвращает текущий href.
+        """
+        try:
+            self.wait.until(
+                lambda _: any(
+                    slide.is_displayed() and slide.get_attribute("href") == expected_href
+                    for slide in self.find_elements(self.COURSES_SLIDER)
+                )
+            )
+        except TimeoutException:
+            pass
+        return self.get_active_slide_href()
+
+    @allure.step("Убедиться, что все нужные элементы отображаются")
+    def check_elements_are_displayed(self) -> "HomePage":
+        for name, locator in self.MAIN_ELEMENTS.items():
+            with allure.step(f"Проверить отображение элемента {name}"):
+                if name == "REGISTER_BUTTON":
+                    self.scroll_to_register_button()
+                assert self.is_displayed(locator), f"Элемент {name} не отображается"

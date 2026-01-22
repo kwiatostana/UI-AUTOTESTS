@@ -1,9 +1,7 @@
 import allure
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.home_page import HomePage
-from src.constants import DEFAULT_TIMEOUT, ZERO
+from src.constants import ZERO
 
 
 @allure.epic("Пользовательский интерфейс")
@@ -15,19 +13,7 @@ class TestHomePageUI:
 
     @allure.title("Проверка отображения всех основных элементов")
     def test_main_page_elements_are_displayed(self, opened_home_page: HomePage) -> None:
-        elements = {
-            "HEADER_CONTACT": opened_home_page.HEADER_CONTACT,
-            "NAVIGATION_MENU": opened_home_page.NAVIGATION_MENU,
-            "REGISTER_BUTTON": opened_home_page.REGISTER_BUTTON,
-            "COURSES_LIST": opened_home_page.COURSES_LIST,
-            "FOOTER": opened_home_page.FOOTER,
-        }
-
-        for name, locator in elements.items():
-            with allure.step(f"Проверить отображение элемента {name}"):
-                if name == "REGISTER_BUTTON":
-                    opened_home_page.scroll_to_register_button()
-                assert opened_home_page.is_displayed(locator), f"Элемент {name} не отображается"
+        opened_home_page.check_elements_are_displayed()
 
     @allure.title("Проверка наличия контактной информации")
     def test_header_contains_contact_information(self, opened_home_page: HomePage) -> None:
@@ -52,38 +38,13 @@ class TestHomePageUI:
         opened_home_page.scroll_to_element(opened_home_page.COURSES_SLIDER)
 
         with allure.step("Получить href начального слайда"):
-            slides = opened_home_page.find_elements(opened_home_page.COURSES_SLIDER)
-            initial_href = ""
-            for slide in slides:
-                if slide.is_displayed():
-                    href = slide.get_attribute("href")
-                    if href:
-                        initial_href = href
-                        break
+            initial_href = opened_home_page.get_active_slide_href()
             assert initial_href, "Не удалось получить ссылку (href) активного слайда"
 
         opened_home_page.click_slider_next()
 
         with allure.step("Проверить изменение href после нажатия 'Вперед'"):
-            wait = WebDriverWait(opened_home_page.driver, DEFAULT_TIMEOUT)
-            try:
-                wait.until(
-                    lambda _: any(
-                        slide.is_displayed() and slide.get_attribute("href") != initial_href
-                        for slide in opened_home_page.find_elements(opened_home_page.COURSES_SLIDER)
-                    )
-                )
-            except TimeoutException:
-                pass
-
-            slides = opened_home_page.find_elements(opened_home_page.COURSES_SLIDER)
-            after_next_href = ""
-            for slide in slides:
-                if slide.is_displayed():
-                    href = slide.get_attribute("href")
-                    if href:
-                        after_next_href = href
-                        break
+            after_next_href = opened_home_page.wait_for_slider_change(initial_href)
             assert after_next_href != initial_href, (
                 f"Href не изменился после нажатия 'Вперед'. Ожидалось отличие от {initial_href}, получено {after_next_href}"
             )
@@ -91,25 +52,7 @@ class TestHomePageUI:
         opened_home_page.click_slider_prev()
 
         with allure.step("Проверить возврат к исходному href после нажатия 'Назад'"):
-            wait = WebDriverWait(opened_home_page.driver, DEFAULT_TIMEOUT)
-            try:
-                wait.until(
-                    lambda _: any(
-                        slide.is_displayed() and slide.get_attribute("href") != after_next_href
-                        for slide in opened_home_page.find_elements(opened_home_page.COURSES_SLIDER)
-                    )
-                )
-            except TimeoutException:
-                pass
-
-            slides = opened_home_page.find_elements(opened_home_page.COURSES_SLIDER)
-            after_prev_href = ""
-            for slide in slides:
-                if slide.is_displayed():
-                    href = slide.get_attribute("href")
-                    if href:
-                        after_prev_href = href
-                        break
+            after_prev_href = opened_home_page.wait_for_slider_match(initial_href)
             assert after_prev_href == initial_href, (
                 f"Href не вернулся к исходному значению после нажатия 'Назад'. Ожидалось {initial_href}, получено {after_prev_href}"
             )

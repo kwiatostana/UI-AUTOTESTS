@@ -49,6 +49,8 @@ class TestLoginValidation:
 
         opened_login_page.logout()
 
+        opened_login_page.close_popup()
+
         with allure.step("Проверить возврат к форме логина"):
             assert opened_login_page.is_displayed(opened_login_page.USERNAME_FIELD), (
                 "Поле имени пользователя не отображается после разлогирования"
