@@ -1,5 +1,6 @@
 from collections.abc import Generator
 
+import allure
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -79,3 +80,36 @@ def banking_test_data_class(driver_class: WebDriver) -> Generator[dict[str, dict
             manager_page.clear_search()
     except Exception as e:
         print(f"Ошибка при удалении клиента {customer_data['first_name']}: {e}")
+
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """Хук для получения результата выполнения теста"""
+    outcome = yield
+    rep = outcome.get_result()
+    setattr(item, f"rep_{rep.when}", rep)
+
+
+@pytest.fixture(autouse=True)
+def screenshot_on_failure(request):
+    """Автоматическое создание скриншота при падении теста"""
+    yield
+    
+    if not (hasattr(request.node, 'rep_call') and request.node.rep_call.failed):
+        return
+    
+    driver = None
+    if 'driver' in request.fixturenames:
+        driver = request.getfixturevalue('driver')
+    elif 'driver_class' in request.fixturenames:
+        driver = request.getfixturevalue('driver_class')
+    
+    if driver:
+        try:
+            allure.attach(
+                driver.get_screenshot_as_png(),
+                name="screenshot",
+                attachment_type=allure.attachment_type.PNG
+            )
+        except Exception as e:
+            print(f"Не удалось создать скриншот: {e}")
