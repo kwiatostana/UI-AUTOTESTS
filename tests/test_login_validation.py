@@ -1,9 +1,15 @@
 import allure
+import pytest
 
 from pages.login_page import LoginPage
-from src.constants import (ERROR_LOGIN_MESSAGE, INVALID_PASSWORD,
-                           INVALID_USERNAME, SUCCESS_LOGIN_MESSAGE,
-                           VALID_PASSWORD, VALID_USERNAME)
+from src.constants import (
+    ERROR_LOGIN_MESSAGE,
+    INVALID_PASSWORD,
+    INVALID_USERNAME,
+    SUCCESS_LOGIN_MESSAGE,
+    VALID_PASSWORD,
+    VALID_USERNAME,
+)
 
 
 @allure.epic("Авторизация")
@@ -58,3 +64,52 @@ class TestLoginValidation:
             assert opened_login_page.is_displayed(opened_login_page.PASSWORD_FIELD), (
                 "Поле пароля не отображается после разлогирования"
             )
+
+
+@allure.epic("Авторизация с параметризованными данными")
+@allure.feature("Проверка авторизации с параметризованными данными")
+@allure.story("Валидация входа пользователя с параметризованными данными")
+@allure.severity(allure.severity_level.BLOCKER)
+class TestParameterizedLoginValidation:
+    """TC_LOGIN_UNI_001: Универсальная проверка авторизации (параметризованный)"""
+
+    @allure.title("Проверка авторизации: {username} + {password}")
+    @pytest.mark.parametrize("username, password, expected_result", [
+        (VALID_USERNAME, VALID_PASSWORD, SUCCESS_LOGIN_MESSAGE),
+        (VALID_USERNAME, INVALID_PASSWORD, ERROR_LOGIN_MESSAGE),
+        (INVALID_USERNAME, VALID_PASSWORD, ERROR_LOGIN_MESSAGE),
+    ])
+    def test_login_with_parameterized_credentials(
+        self,
+        opened_login_page: LoginPage,
+        username: str,
+        password: str,
+        expected_result: str
+    ) -> None:
+
+        opened_login_page.login(username, password)
+
+        if expected_result == SUCCESS_LOGIN_MESSAGE:
+            with allure.step("Проверить сообщение об успешной авторизации"):
+                success_message = opened_login_page.get_success_message()
+                assert expected_result in success_message, (
+                    f"Ожидалось сообщение '{expected_result}', но получено '{success_message}'"
+                )
+
+            opened_login_page.logout()
+            opened_login_page.close_popup()
+
+            with allure.step("Проверить возврат к форме логина после выхода"):
+                assert opened_login_page.is_displayed(opened_login_page.USERNAME_FIELD), (
+                    "Поле имени пользователя не отображается после разлогирования"
+                )
+                assert opened_login_page.is_displayed(opened_login_page.PASSWORD_FIELD), (
+                    "Поле пароля не отображается после разлогирования"
+                )
+
+        else:
+            with allure.step("Проверить сообщение об ошибке авторизации"):
+                actual_error = opened_login_page.get_error_message()
+                assert actual_error == expected_result, (
+                    f"Ожидалась ошибка '{expected_result}', но получена '{actual_error}'"
+                )
