@@ -7,6 +7,7 @@ from pages.home_page import HomePage
 @allure.feature("Навигационное меню")
 @allure.story("Закрепленное меню при скроллинге")
 @allure.severity(allure.severity_level.MINOR)
+@allure.id("TC_NAV_SCROLL_002")
 class TestStickyMenu:
     """Тест-кейс 2: Меню навигации при скроллинге"""
 
