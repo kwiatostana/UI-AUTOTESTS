@@ -16,6 +16,7 @@ from src.constants import (
 @allure.feature("Проверка авторизации")
 @allure.story("Валидация входа и выхода пользователя")
 @allure.severity(allure.severity_level.BLOCKER)
+@allure.id("TC_LOGIN_FLOW_004")
 class TestLoginValidation:
     """Тест-кейс 4: Проверка авторизации"""
 
@@ -70,6 +71,7 @@ class TestLoginValidation:
 @allure.feature("Проверка авторизации с параметризованными данными")
 @allure.story("Валидация входа пользователя с параметризованными данными")
 @allure.severity(allure.severity_level.BLOCKER)
+@allure.id("TC_LOGIN_UNI_001")
 class TestParameterizedLoginValidation:
     """TC_LOGIN_UNI_001: Универсальная проверка авторизации (параметризованный)"""
 

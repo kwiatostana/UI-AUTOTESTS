@@ -2,14 +2,14 @@ import allure
 
 from pages.home_page import HomePage
 from pages.lifetime_membership_page import LifetimeMembershipPage
-from src.constants import (LIFETIME_MEMBERSHIP_CLUB_TEXT,
-                           LIFETIME_MEMBERSHIP_URL)
+from src.constants import LIFETIME_MEMBERSHIP_CLUB_TEXT, LIFETIME_MEMBERSHIP_URL
 
 
 @allure.epic("Навигация")
 @allure.feature("Переходы по страницам")
 @allure.story("Переход на страницу Lifetime membership")
 @allure.severity(allure.severity_level.NORMAL)
+@allure.id("TC_NAV_TRANSITION_003")
 class TestNavigationTransition:
     """Тест-кейс 3: Проверка перехода по меню навигации"""
 

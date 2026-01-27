@@ -8,6 +8,7 @@ from src.constants import ZERO
 @allure.feature("Главная страница")
 @allure.story("Отображение элементов и навигация на главной странице")
 @allure.severity(allure.severity_level.NORMAL)
+@allure.id("TC_MAIN_PAGE_001")
 class TestHomePageUI:
     """Тест-кейс 1: Главная страница"""
 
