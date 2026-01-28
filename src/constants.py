@@ -46,3 +46,5 @@ POST_CODE_LENGTH = 5
 COOKIES_LOGIN = os.getenv("COOKIES_LOGIN")
 COOKIES_PASSWORD = os.getenv("COOKIES_PASSWORD")
 COOKIE_FILE_PATH = "state/cookies.json"
+
+JS_USERNAME = "AutoTester"
