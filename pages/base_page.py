@@ -14,6 +14,8 @@ Locator = tuple[str, str]
 class BasePage:
     """Базовый класс для всех page objects"""
 
+    POPUP_CLOSE_BUTTON: Locator = (By.CSS_SELECTOR, ".dialog-close-button.dialog-lightbox-close-button")
+
     def __init__(self, driver: WebDriver, timeout: int = DEFAULT_TIMEOUT) -> None:
         self.driver: WebDriver = driver
         self.wait = WebDriverWait(driver, timeout)
@@ -127,11 +129,10 @@ class BasePage:
 
     def close_popup(self, wait_timeout: int = 8) -> "BasePage":
         """Закрыть попап"""
-        popup_close_button = (By.CSS_SELECTOR, ".dialog-close-button.dialog-lightbox-close-button")
         popup_wait = WebDriverWait(self.driver, wait_timeout)
 
         try:
-            element = popup_wait.until(EC.element_to_be_clickable(popup_close_button))
+            element = popup_wait.until(EC.element_to_be_clickable(self.POPUP_CLOSE_BUTTON))
             try:
                 element.click()
             except Exception:

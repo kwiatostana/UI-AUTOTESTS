@@ -94,16 +94,16 @@ def pytest_runtest_makereport(item, call):
 def screenshot_on_failure(request):
     """Автоматическое создание скриншота при падении теста"""
     yield
-    
-    if not (hasattr(request.node, 'rep_call') and request.node.rep_call.failed):
+
+    if not (hasattr(request.node, "rep_call") and request.node.rep_call.failed):
         return
-    
+
     driver = None
-    if 'driver' in request.fixturenames:
-        driver = request.getfixturevalue('driver')
-    elif 'driver_class' in request.fixturenames:
-        driver = request.getfixturevalue('driver_class')
-    
+    if "driver" in request.fixturenames:
+        driver = request.getfixturevalue("driver")
+    elif "driver_class" in request.fixturenames:
+        driver = request.getfixturevalue("driver_class")
+
     if driver:
         try:
             allure.attach(
