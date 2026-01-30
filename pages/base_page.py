@@ -147,3 +147,21 @@ class BasePage:
             pass
 
         return self
+
+    def blur_element(self, locator: Locator) -> "BasePage":
+        """Снять фокус с элемента через JS"""
+        element = self.find_element(locator)
+        self.driver.execute_script("arguments[0].blur();", element)
+        return self
+
+    def is_element_focused(self, locator: Locator) -> bool:
+        """Проверить, находится ли элемент в фокусе"""
+        element = self.find_element(locator)
+        active_element = self.driver.switch_to.active_element
+        return element == active_element
+
+    def has_vertical_scroll(self) -> bool:
+        """Проверить наличие вертикального скролла на странице"""
+        return self.driver.execute_script(
+            "return document.documentElement.scrollHeight > document.documentElement.clientHeight;"
+        )

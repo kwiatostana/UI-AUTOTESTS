@@ -10,7 +10,10 @@ from pages.banking_home_page import BankingHomePage
 from pages.banking_manager_page import BankingManagerPage
 from pages.home_page import HomePage
 from pages.login_page import LoginPage
-from src.constants import BANKING_URL, HOME_URL, LOGIN_URL, POPUP_TIMEOUT
+from pages.sample_form_page import SampleFormPage
+
+from src.constants import (BANKING_URL, HOME_URL, LOGIN_URL, POPUP_TIMEOUT, SAMPLE_FORM_URL)
+
 from utils.data_generator import (generate_customer_data,
                                   generate_registration_data)
 
@@ -81,6 +84,12 @@ def banking_test_data_class(driver_class: WebDriver) -> Generator[dict[str, dict
     except Exception as e:
         print(f"Ошибка при удалении клиента {customer_data['first_name']}: {e}")
 
+@pytest.fixture
+def opened_sample_form_page(driver: WebDriver) -> SampleFormPage:
+    """Фикстура для создания и открытия страницы Sample Form"""
+    page = SampleFormPage(driver)
+    page.open(SAMPLE_FORM_URL)
+    return page
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
