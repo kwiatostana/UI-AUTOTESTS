@@ -6,25 +6,48 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.remote.webdriver import WebDriver
 
+from pages.alerts_page import AlertsPage
 from pages.banking_home_page import BankingHomePage
 from pages.banking_manager_page import BankingManagerPage
+from pages.basic_auth_page import BasicAuthPage
+from pages.drag_n_drop_page import DragNDropPage
 from pages.home_page import HomePage
 from pages.login_page import LoginPage
 from pages.sample_form_page import SampleFormPage
-
-from src.constants import (BANKING_URL, HOME_URL, LOGIN_URL, POPUP_TIMEOUT, SAMPLE_FORM_URL)
-
+from pages.tabs_page import TabsPage
+from src.constants import (ALERTS_URL, BANKING_URL, BASIC_AUTH_URL,
+                           DRAG_N_DROP_URL, HOME_URL, LOGIN_URL, POPUP_TIMEOUT,
+                           SAMPLE_FORM_URL, TABS_URL)
 from utils.data_generator import (generate_customer_data,
                                   generate_registration_data)
 
 
+def pytest_addoption(parser):
+    """Добавляем опцию --executor для выбора места запуска тестов"""
+    parser.addoption(
+        "--executor", 
+        action="store", 
+        default="local", 
+        help="Куда отправлять тесты: local (локально) или grid (на Selenium Grid)"
+    )
+
+
 @pytest.fixture
-def driver() -> Generator[WebDriver]:
+def driver(request) -> Generator[WebDriver]:
     """Фикстура для создания драйвера"""
     chrome_options = Options()
     chrome_options.add_argument("--start-maximized")
-
-    driver = webdriver.Chrome(options=chrome_options)
+    
+    executor = request.config.getoption("--executor")
+    
+    driver = None
+    if executor == "grid":
+        driver = webdriver.Remote(
+            command_executor='http://localhost:4444/wd/hub',
+            options=chrome_options
+        )
+    else:
+        driver = webdriver.Chrome(options=chrome_options)
 
     yield driver
 
@@ -49,16 +72,67 @@ def opened_login_page(driver: WebDriver) -> LoginPage:
 
 
 @pytest.fixture(scope="class")
-def driver_class() -> Generator[WebDriver]:
-    """Фикстура драйвера с scope='class' для общего состояния во всех тестах класса"""
+def driver_class(request) -> Generator[WebDriver]:
+    """Фикстура драйвера с scope='class'"""
     chrome_options = Options()
     chrome_options.add_argument("--start-maximized")
 
-    driver = webdriver.Chrome(options=chrome_options)
+    executor = request.config.getoption("--executor")
+
+    driver = None
+    if executor == "grid":
+        driver = webdriver.Remote(
+            command_executor='http://localhost:4444/wd/hub',
+            options=chrome_options
+        )
+    else:
+        driver = webdriver.Chrome(options=chrome_options)
 
     yield driver
 
     driver.quit()
+
+
+@pytest.fixture
+def opened_drag_n_drop_page(driver: WebDriver) -> DragNDropPage:
+    """Фикстура для создания и открытия страницы Drag and Drop"""
+    page = DragNDropPage(driver)
+    page.open(DRAG_N_DROP_URL)
+    page.switch_to_demo_frame()
+    return page
+
+
+@pytest.fixture
+def opened_tabs_page(driver: WebDriver) -> TabsPage:
+    """Фикстура для создания и открытия страницы Tabs"""
+    page = TabsPage(driver)
+    page.open(TABS_URL)
+    page.switch_to_demo_frame()
+    return page
+
+
+@pytest.fixture
+def opened_alerts_page(driver: WebDriver) -> AlertsPage:
+    """Фикстура для создания и открытия страницы Alerts"""
+    page = AlertsPage(driver)
+    page.open(ALERTS_URL)
+    return page
+
+
+@pytest.fixture
+def opened_basic_auth_page(driver: WebDriver) -> BasicAuthPage:
+    """Фикстура для создания и открытия страницы Basic Auth"""
+    page = BasicAuthPage(driver)
+    page.open(BASIC_AUTH_URL)
+    return page
+
+
+@pytest.fixture
+def opened_sample_form_page(driver: WebDriver) -> SampleFormPage:
+    """Фикстура для создания и открытия страницы Sample Form"""
+    page = SampleFormPage(driver)
+    page.open(SAMPLE_FORM_URL)
+    return page
 
 
 @pytest.fixture(scope="class")
@@ -84,12 +158,6 @@ def banking_test_data_class(driver_class: WebDriver) -> Generator[dict[str, dict
     except Exception as e:
         print(f"Ошибка при удалении клиента {customer_data['first_name']}: {e}")
 
-@pytest.fixture
-def opened_sample_form_page(driver: WebDriver) -> SampleFormPage:
-    """Фикстура для создания и открытия страницы Sample Form"""
-    page = SampleFormPage(driver)
-    page.open(SAMPLE_FORM_URL)
-    return page
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
