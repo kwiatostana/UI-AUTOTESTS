@@ -127,6 +127,16 @@ class BasePage:
         "Получить текущий url"
         return self.driver.current_url
 
+    def switch_to_new_window(self) -> "BasePage":
+        """Переключиться на новую вкладку/окно"""
+        current_window = self.driver.current_window_handle
+        all_windows = self.driver.window_handles
+        for window in all_windows:
+            if window != current_window:
+                self.driver.switch_to.window(window)
+                break
+        return self
+
     def close_popup(self, wait_timeout: int = 8) -> "BasePage":
         """Закрыть попап"""
         popup_wait = WebDriverWait(self.driver, wait_timeout)
