@@ -118,8 +118,16 @@ class BasePage:
 
     def accept_alert(self) -> "BasePage":
         """Принять alert"""
-        if self.wait_for_alert():
-            alert = self.driver.switch_to.alert
+        alert = self.wait_for_alert()
+        if alert:
+            alert.accept()
+        return self
+
+    def send_keys_to_alert(self, text: str) -> "BasePage":
+        """Ввести текст в alert и принять его"""
+        alert = self.wait_for_alert()
+        if alert:
+            alert.send_keys(text)
             alert.accept()
         return self
 
