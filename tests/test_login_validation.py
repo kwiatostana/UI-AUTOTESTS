@@ -2,14 +2,9 @@ import allure
 import pytest
 
 from pages.login_page import LoginPage
-from src.constants import (
-    ERROR_LOGIN_MESSAGE,
-    INVALID_PASSWORD,
-    INVALID_USERNAME,
-    SUCCESS_LOGIN_MESSAGE,
-    VALID_PASSWORD,
-    VALID_USERNAME,
-)
+from src.constants import (ERROR_LOGIN_MESSAGE, INVALID_PASSWORD,
+                           INVALID_USERNAME, SUCCESS_LOGIN_MESSAGE,
+                           VALID_PASSWORD, VALID_USERNAME)
 
 
 @allure.epic("Авторизация")
