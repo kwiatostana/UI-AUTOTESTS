@@ -12,6 +12,10 @@ LIFETIME_MEMBERSHIP_URL = os.getenv("LIFETIME_MEMBERSHIP_URL")
 BANKING_CUSTOMER_URL = os.getenv("BANKING_CUSTOMER_URL")
 BANKING_MANAGER_URL = os.getenv("BANKING_MANAGER_URL")
 COOKIES_URL = os.getenv("COOKIES_URL")
+DRAG_N_DROP_URL = os.getenv("DRAG_N_DROP_URL")
+TABS_URL = os.getenv("TABS_URL")
+ALERTS_URL = os.getenv("ALERTS_URL")
+BASIC_AUTH_URL = os.getenv("BASIC_AUTH_URL")
 
 VALID_USERNAME = os.getenv("VALID_USERNAME")
 VALID_PASSWORD = os.getenv("VALID_PASSWORD")
@@ -42,6 +46,12 @@ HOBBY_SPORTS = "Sports"
 GENDER_FEMALE = "female"
 
 POST_CODE_LENGTH = 5
+
+EXPECTED_WINDOWS_COUNT_TWO = 2
+EXPECTED_WINDOWS_COUNT_THREE = 3
+
+BASIC_AUTH_LOGIN = os.getenv("BASIC_AUTH_LOGIN")
+BASIC_AUTH_PASSWORD = os.getenv("BASIC_AUTH_PASSWORD") #пароль подходит любой абсолютно, но сработает 1 раз на открытие страницы, использую пароль из условий задания, для нескольких попыток подряд нужно генерить рандомный пароль
 
 COOKIES_LOGIN = os.getenv("COOKIES_LOGIN")
 COOKIES_PASSWORD = os.getenv("COOKIES_PASSWORD")

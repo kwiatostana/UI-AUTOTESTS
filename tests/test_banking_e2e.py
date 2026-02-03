@@ -5,18 +5,11 @@ from pages.banking_customer_page import BankingCustomerPage
 from pages.banking_home_page import BankingHomePage
 from pages.banking_manager_page import BankingManagerPage
 from pages.sample_form_page import SampleFormPage
-from src.constants import (
-    BANKING_URL,
-    DEPOSIT_AMOUNT,
-    DEPOSIT_SUCCESS_MESSAGE,
-    GENDER_FEMALE,
-    REGISTRATION_SUCCESS_MESSAGE,
-    SAMPLE_FORM_URL,
-    WITHDRAWAL_AMOUNT_LARGE,
-    WITHDRAWAL_FAILED_MESSAGE,
-    WITHDRAWAL_SUCCESS_MESSAGE,
-    ZERO,
-)
+from src.constants import (BANKING_URL, DEPOSIT_AMOUNT,
+                           DEPOSIT_SUCCESS_MESSAGE, GENDER_FEMALE,
+                           REGISTRATION_SUCCESS_MESSAGE, SAMPLE_FORM_URL,
+                           WITHDRAWAL_AMOUNT_LARGE, WITHDRAWAL_FAILED_MESSAGE,
+                           WITHDRAWAL_SUCCESS_MESSAGE, ZERO)
 
 
 @allure.epic("Банковская система")

@@ -118,14 +118,32 @@ class BasePage:
 
     def accept_alert(self) -> "BasePage":
         """Принять alert"""
-        if self.wait_for_alert():
-            alert = self.driver.switch_to.alert
+        alert = self.wait_for_alert()
+        if alert:
+            alert.accept()
+        return self
+
+    def send_keys_to_alert(self, text: str) -> "BasePage":
+        """Ввести текст в alert и принять его"""
+        alert = self.wait_for_alert()
+        if alert:
+            alert.send_keys(text)
             alert.accept()
         return self
 
     def get_current_url(self) -> str:
         "Получить текущий url"
         return self.driver.current_url
+
+    def switch_to_new_window(self) -> "BasePage":
+        """Переключиться на новую вкладку/окно"""
+        current_window = self.driver.current_window_handle
+        all_windows = self.driver.window_handles
+        for window in all_windows:
+            if window != current_window:
+                self.driver.switch_to.window(window)
+                break
+        return self
 
     def close_popup(self, wait_timeout: int = 8) -> "BasePage":
         """Закрыть попап"""

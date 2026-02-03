@@ -2,10 +2,9 @@ from collections.abc import Generator
 
 import allure
 import pytest
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.remote.webdriver import WebDriver
 
+from driver_factory import DriverFactory
 from pages.alerts_page import AlertsPage
 from pages.banking_home_page import BankingHomePage
 from pages.banking_manager_page import BankingManagerPage
@@ -23,31 +22,41 @@ from utils.data_generator import (generate_customer_data,
 
 
 def pytest_addoption(parser):
-    """Добавляем опцию --executor для выбора места запуска тестов"""
+    """Добавляем опции для выбора браузера и режима запуска"""
     parser.addoption(
-        "--executor", 
-        action="store", 
-        default="local", 
-        help="Куда отправлять тесты: local (локально) или grid (на Selenium Grid)"
+        "--browser",
+        action="store",
+        default="chrome",
+        choices=["chrome", "firefox", "edge"],
+        help="Браузер для тестов: chrome, firefox, edge"
+    )
+    parser.addoption(
+        "--executor",
+        action="store",
+        default="local",
+        choices=["local", "grid"],
+        help="Режим запуска: локально или Selenium Grid"
+    )
+    parser.addoption(
+        "--grid-url",
+        action="store",
+        default="http://localhost:4444",
+        help="URL Selenium Grid (по умолчанию http://localhost:4444)"
     )
 
 
 @pytest.fixture
 def driver(request) -> Generator[WebDriver]:
-    """Фикстура для создания драйвера"""
-    chrome_options = Options()
-    chrome_options.add_argument("--start-maximized")
-    
+    """Фикстура для создания драйвера через DriverFactory"""
+    browser = request.config.getoption("--browser")
     executor = request.config.getoption("--executor")
-    
-    driver = None
-    if executor == "grid":
-        driver = webdriver.Remote(
-            command_executor='http://localhost:4444/wd/hub',
-            options=chrome_options
-        )
-    else:
-        driver = webdriver.Chrome(options=chrome_options)
+    grid_url = request.config.getoption("--grid-url")
+
+    driver = DriverFactory.create_driver(
+        browser_name=browser,
+        use_grid=(executor == "grid"),
+        grid_url=grid_url
+    )
 
     yield driver
 
@@ -73,20 +82,16 @@ def opened_login_page(driver: WebDriver) -> LoginPage:
 
 @pytest.fixture(scope="class")
 def driver_class(request) -> Generator[WebDriver]:
-    """Фикстура драйвера с scope='class'"""
-    chrome_options = Options()
-    chrome_options.add_argument("--start-maximized")
-
+    """Фикстура драйвера с scope='class' через DriverFactory"""
+    browser = request.config.getoption("--browser")
     executor = request.config.getoption("--executor")
+    grid_url = request.config.getoption("--grid-url")
 
-    driver = None
-    if executor == "grid":
-        driver = webdriver.Remote(
-            command_executor='http://localhost:4444/wd/hub',
-            options=chrome_options
-        )
-    else:
-        driver = webdriver.Chrome(options=chrome_options)
+    driver = DriverFactory.create_driver(
+        browser_name=browser,
+        use_grid=(executor == "grid"),
+        grid_url=grid_url
+    )
 
     yield driver
 

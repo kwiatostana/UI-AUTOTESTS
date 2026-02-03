@@ -2,7 +2,8 @@ import allure
 
 from pages.home_page import HomePage
 from pages.lifetime_membership_page import LifetimeMembershipPage
-from src.constants import LIFETIME_MEMBERSHIP_CLUB_TEXT, LIFETIME_MEMBERSHIP_URL
+from src.constants import (LIFETIME_MEMBERSHIP_CLUB_TEXT,
+                           LIFETIME_MEMBERSHIP_URL)
 
 
 @allure.epic("Навигация")

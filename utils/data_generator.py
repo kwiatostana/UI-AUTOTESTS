@@ -22,3 +22,8 @@ def generate_registration_data() -> dict[str, str]:
         "email": _fake.email(),
         "password": _fake.password(),
     }
+
+
+def generate_random_name() -> str:
+    """Генерирует случайное имя"""
+    return _fake.first_name()
