@@ -10,6 +10,8 @@ services:
     image: aerokube/selenoid:latest
     networks:
       - selenoid-net
+    environment:
+      - DOCKER_API_VERSION=1.48
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./browsers.json:/etc/selenoid/browsers.json:ro
