@@ -1,0 +1,12 @@
+venv/
+.git/
+.gitignore
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+allure-results/
+grid/
+state/
+.env
+*.egg-info/

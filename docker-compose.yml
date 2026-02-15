@@ -1,0 +1,37 @@
+networks:
+  selenoid-net:
+    name: selenoid-net
+
+volumes:
+  pip-cache:
+
+services:
+  selenoid:
+    image: aerokube/selenoid:latest
+    networks:
+      - selenoid-net
+    environment:
+      - DOCKER_API_VERSION=1.48
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./browsers.json:/etc/selenoid/browsers.json:ro
+    ports:
+      - "4444:4444"
+    command:
+      - "-conf"
+      - "/etc/selenoid/browsers.json"
+      - "-container-network"
+      - "selenoid-net"
+      - "-limit"
+      - "4"
+
+  tests:
+    build: .
+    networks:
+      - selenoid-net
+    depends_on:
+      - selenoid
+    volumes:
+      - ./allure-results:/app/allure-results
+      - ./.env:/app/.env:ro
+      - pip-cache:/root/.cache/pip

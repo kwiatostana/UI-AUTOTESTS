@@ -43,6 +43,12 @@ def pytest_addoption(parser):
         default="http://localhost:4444",
         help="URL Selenium Grid (по умолчанию http://localhost:4444)"
     )
+    parser.addoption(
+        "--headless",
+        action="store_true",
+        default=False,
+        help="Запуск браузера в headless-режиме"
+    )
 
 
 @pytest.fixture
@@ -51,11 +57,13 @@ def driver(request) -> Generator[WebDriver]:
     browser = request.config.getoption("--browser")
     executor = request.config.getoption("--executor")
     grid_url = request.config.getoption("--grid-url")
+    headless = request.config.getoption("--headless")
 
     driver = DriverFactory.create_driver(
         browser_name=browser,
         use_grid=(executor == "grid"),
-        grid_url=grid_url
+        grid_url=grid_url,
+        headless=headless
     )
 
     yield driver
@@ -86,11 +94,13 @@ def driver_class(request) -> Generator[WebDriver]:
     browser = request.config.getoption("--browser")
     executor = request.config.getoption("--executor")
     grid_url = request.config.getoption("--grid-url")
+    headless = request.config.getoption("--headless")
 
     driver = DriverFactory.create_driver(
         browser_name=browser,
         use_grid=(executor == "grid"),
-        grid_url=grid_url
+        grid_url=grid_url,
+        headless=headless
     )
 
     yield driver

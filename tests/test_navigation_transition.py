@@ -1,11 +1,12 @@
 import allure
+import pytest
 
 from pages.home_page import HomePage
 from pages.lifetime_membership_page import LifetimeMembershipPage
 from src.constants import (LIFETIME_MEMBERSHIP_CLUB_TEXT,
                            LIFETIME_MEMBERSHIP_URL)
 
-
+@pytest.mark.ci
 @allure.epic("Навигация")
 @allure.feature("Переходы по страницам")
 @allure.story("Переход на страницу Lifetime membership")
