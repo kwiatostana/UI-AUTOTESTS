@@ -1,9 +1,10 @@
 import allure
+import pytest
 
 from pages.alerts_page import AlertsPage
 from utils.data_generator import generate_random_name
 
-
+@pytest.mark.ci
 @allure.epic("Пользовательский интерфейс")
 @allure.feature("Alert")
 @allure.story("Взаимодействие с Input Alert")

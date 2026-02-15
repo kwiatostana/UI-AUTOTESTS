@@ -13,7 +13,8 @@ class DriverFactory:
     def create_driver(
         browser_name: Literal["chrome", "firefox", "edge"] = "chrome",
         use_grid: bool = False,
-        grid_url: str = "http://localhost:4444"
+        grid_url: str = "http://localhost:4444",
+        headless: bool = False
     ) -> WebDriver:
 
         browser_name = browser_name.lower()
@@ -24,7 +25,7 @@ class DriverFactory:
                 f"Доступные: {', '.join(DriverFactory.SUPPORTED_BROWSERS)}"
             )
 
-        options = DriverFactory._get_browser_options(browser_name)
+        options = DriverFactory._get_browser_options(browser_name, headless=headless)
 
         if use_grid:
             driver = DriverFactory._create_remote_driver(grid_url, options)
@@ -34,7 +35,7 @@ class DriverFactory:
         return driver
 
     @staticmethod
-    def _get_browser_options(browser_name: str):
+    def _get_browser_options(browser_name: str, headless: bool = False):
         """Создает options для указанного браузера"""
 
         if browser_name == "chrome":
@@ -42,6 +43,11 @@ class DriverFactory:
             options.add_argument("--start-maximized")
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
             options.add_experimental_option("useAutomationExtension", False)
+            if headless:
+                options.add_argument("--headless=new")
+                options.add_argument("--no-sandbox")
+                options.add_argument("--disable-dev-shm-usage")
+                options.add_argument("--window-size=1920,1080")
 
         elif browser_name == "firefox":
             options = webdriver.FirefoxOptions()
